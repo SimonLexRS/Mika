@@ -11,7 +11,7 @@ FROM node:20-alpine AS assets-builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --silent
+RUN npm install --silent --legacy-peer-deps
 
 COPY resources/ resources/
 COPY vite.config.js tailwind.config.js postcss.config.js ./
