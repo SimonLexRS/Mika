@@ -83,7 +83,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # Crear Caddyfile para FrankenPHP
-RUN echo '{\n\
+RUN printf '{\n\
     auto_https off\n\
     admin off\n\
 }\n\

@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 echo "========================================"
 echo "  Iniciando Mika - Dokploy"
@@ -17,7 +16,7 @@ fi
 if [ -z "$APP_KEY" ]; then
     if ! grep -q "APP_KEY=base64" .env 2>/dev/null; then
         echo "Generando APP_KEY..."
-        php artisan key:generate --force 2>/dev/null || true
+        php artisan key:generate --force || true
     fi
 fi
 
@@ -27,7 +26,13 @@ max_attempts=30
 attempt=1
 
 while [ $attempt -le $max_attempts ]; do
-    if php artisan db:monitor --databases=pgsql > /dev/null 2>&1; then
+    if php -r "
+        \$host = getenv('DB_HOST') ?: 'db';
+        \$port = getenv('DB_PORT') ?: '5432';
+        \$fp = @fsockopen(\$host, \$port, \$errno, \$errstr, 5);
+        if (\$fp) { fclose(\$fp); exit(0); }
+        exit(1);
+    " 2>/dev/null; then
         echo "PostgreSQL disponible"
         break
     fi
@@ -38,16 +43,17 @@ done
 
 # Ejecutar migraciones
 echo "Ejecutando migraciones..."
-php artisan migrate --force 2>/dev/null || echo "Migraciones pendientes o error"
+php artisan migrate --force || echo "Migraciones pendientes o error"
 
 # Crear enlace de storage
 php artisan storage:link 2>/dev/null || true
 
-# Cachear para producción
+# Limpiar y cachear para producción
 echo "Optimizando para producción..."
-php artisan config:cache 2>/dev/null || true
-php artisan route:cache 2>/dev/null || true
-php artisan view:cache 2>/dev/null || true
+php artisan config:clear || true
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan view:cache || true
 
 echo "========================================"
 echo "  Mika lista en puerto 8040"
