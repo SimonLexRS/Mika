@@ -75,8 +75,8 @@ COPY --from=assets-builder /app/public/build ./public/build
 # Copiar código fuente
 COPY . .
 
-# Generar autoload optimizado
-RUN /usr/bin/composer dump-autoload --optimize --classmap-authoritative
+# Generar autoload optimizado (ignorar platform check heredado)
+RUN /usr/bin/composer dump-autoload --optimize --classmap-authoritative --ignore-platform-reqs
 
 # Configurar permisos
 RUN chown -R www-data:www-data storage bootstrap/cache \
