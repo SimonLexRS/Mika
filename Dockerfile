@@ -63,6 +63,9 @@ RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/mika.ini \
 
 WORKDIR /app
 
+# Copiar composer desde la imagen de composer
+COPY --from=php-deps /usr/bin/composer /usr/bin/composer
+
 # Copiar dependencias de Composer
 COPY --from=php-deps /app/vendor ./vendor
 
@@ -73,7 +76,7 @@ COPY --from=assets-builder /app/public/build ./public/build
 COPY . .
 
 # Generar autoload optimizado
-RUN composer dump-autoload --optimize --classmap-authoritative
+RUN /usr/bin/composer dump-autoload --optimize --classmap-authoritative
 
 # Configurar permisos
 RUN chown -R www-data:www-data storage bootstrap/cache \
