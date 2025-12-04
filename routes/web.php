@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Healthcheck endpoint para Docker/Dokploy
+Route::get('/up', fn() => response('OK', 200));
+
 Route::get('/', function () {
     return redirect()->route('chat');
 });
