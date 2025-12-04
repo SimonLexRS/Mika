@@ -3,6 +3,7 @@ version: '3.8'
 # =============================================================================
 # Docker Compose para Mika - Dokploy
 # Puerto: 8040
+# Base de datos: PostgreSQL remota (100.115.234.125:5450)
 # =============================================================================
 
 services:
@@ -26,46 +27,22 @@ services:
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_URL=${APP_URL:-http://localhost:8040}
       - DB_CONNECTION=pgsql
-      - DB_HOST=${DB_HOST:-db}
-      - DB_PORT=${DB_PORT:-5432}
+      - DB_HOST=${DB_HOST:-100.115.234.125}
+      - DB_PORT=${DB_PORT:-5450}
       - DB_DATABASE=${DB_DATABASE:-mika}
       - DB_USERNAME=${DB_USERNAME:-mika}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - DB_PASSWORD=${DB_PASSWORD:-9qgwVerQ79YznKeEqBiD}
       - SESSION_DRIVER=database
       - QUEUE_CONNECTION=database
       - CACHE_STORE=database
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - mika-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8040/up"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # =========================================================================
-  # Base de Datos PostgreSQL
-  # =========================================================================
-  db:
-    image: postgres:16-alpine
-    container_name: mika-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_DATABASE:-mika}
-      POSTGRES_USER: ${DB_USERNAME:-mika}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
-    volumes:
-      - mika-db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-mika} -d ${DB_DATABASE:-mika}"]
-      interval: 5s
-      timeout: 5s
       retries: 5
-    networks:
-      - mika-network
+      start_period: 60s
 
   # =========================================================================
   # Queue Worker (opcional)
@@ -83,14 +60,13 @@ services:
       - APP_ENV=${APP_ENV:-production}
       - APP_KEY=${APP_KEY}
       - DB_CONNECTION=pgsql
-      - DB_HOST=${DB_HOST:-db}
-      - DB_PORT=${DB_PORT:-5432}
+      - DB_HOST=${DB_HOST:-100.115.234.125}
+      - DB_PORT=${DB_PORT:-5450}
       - DB_DATABASE=${DB_DATABASE:-mika}
       - DB_USERNAME=${DB_USERNAME:-mika}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - DB_PASSWORD=${DB_PASSWORD:-9qgwVerQ79YznKeEqBiD}
     depends_on:
-      db:
-        condition: service_healthy
+      - app
     networks:
       - mika-network
 
@@ -105,7 +81,5 @@ networks:
 # Volúmenes
 # =============================================================================
 volumes:
-  mika-db-data:
-    driver: local
   mika-storage:
     driver: local
