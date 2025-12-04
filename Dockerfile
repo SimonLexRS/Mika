@@ -91,8 +91,14 @@ RUN printf '{\n\
 :8040 {\n\
     root * /app/public\n\
     encode gzip\n\
-    php_server\n\
-    file_server\n\
+    \n\
+    # Healthcheck endpoint\n\
+    respond /up 200\n\
+    \n\
+    route {\n\
+        php_server\n\
+        file_server\n\
+    }\n\
 }\n' > /etc/caddy/Caddyfile
 
 # Variables de entorno por defecto
