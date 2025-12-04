@@ -1,0 +1,111 @@
+version: '3.8'
+
+# =============================================================================
+# Docker Compose para Mika - Dokploy
+# Puerto: 8040
+# =============================================================================
+
+services:
+  # =========================================================================
+  # Aplicación Mika (FrankenPHP todo-en-uno)
+  # =========================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mika-app
+    restart: unless-stopped
+    ports:
+      - "8040:8040"
+    volumes:
+      - mika-storage:/app/storage
+    environment:
+      - APP_NAME=${APP_NAME:-Mika}
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost:8040}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE:-mika}
+      - DB_USERNAME=${DB_USERNAME:-mika}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - SESSION_DRIVER=database
+      - QUEUE_CONNECTION=database
+      - CACHE_STORE=database
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mika-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8040/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =========================================================================
+  # Base de Datos PostgreSQL
+  # =========================================================================
+  db:
+    image: postgres:16-alpine
+    container_name: mika-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-mika}
+      POSTGRES_USER: ${DB_USERNAME:-mika}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - mika-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-mika} -d ${DB_DATABASE:-mika}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mika-network
+
+  # =========================================================================
+  # Queue Worker (opcional)
+  # =========================================================================
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mika-queue
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    volumes:
+      - mika-storage:/app/storage
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE:-mika}
+      - DB_USERNAME=${DB_USERNAME:-mika}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mika-network
+
+# =============================================================================
+# Redes
+# =============================================================================
+networks:
+  mika-network:
+    driver: bridge
+
+# =============================================================================
+# Volúmenes
+# =============================================================================
+volumes:
+  mika-db-data:
+    driver: local
+  mika-storage:
+    driver: local
