@@ -76,7 +76,7 @@ php artisan storage:link 2>/dev/null || true
 echo "Optimizando para producción..."
 php artisan config:clear || true
 php artisan config:cache || true
-php artisan route:cache || true
+# Nota: route:cache no funciona con closures, omitiendo
 php artisan view:cache || true
 
 echo "========================================"
