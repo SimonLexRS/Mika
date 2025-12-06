@@ -86,6 +86,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 RUN printf '{\n\
     auto_https off\n\
     admin off\n\
+    order php_server before file_server\n\
 }\n\
 \n\
 :8040 {\n\
