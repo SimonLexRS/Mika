@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            TenantSeeder::class, // ERP: Crea tenant, sucursal, categorías y productos
             TransactionSeeder::class,
             ConversationSeeder::class,
         ]);

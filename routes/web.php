@@ -1,15 +1,27 @@
 <?php
 
+use App\Livewire\Pos\Terminal;
+use App\Livewire\Pos\CashRegisterOpen;
+use App\Livewire\Pos\CashRegisterClose;
+use App\Livewire\Inventory\ProductList;
+use App\Livewire\Inventory\ProductForm;
+use App\Livewire\Reports\SalesDashboard;
 use Illuminate\Support\Facades\Route;
 
 // Healthcheck endpoint para Docker/Dokploy
 Route::get('/up', fn() => response('OK', 200));
 
 Route::get('/', function () {
-    return redirect()->route('chat');
+    return redirect()->route('dashboard');
 });
 
 Route::middleware(['auth'])->group(function () {
+    // Dashboard principal
+    Route::get('/dashboard', function () {
+        return view('pages.dashboard');
+    })->name('dashboard');
+
+    // Chat (funcionalidad original de Mika)
     Route::get('/chat', function () {
         return view('pages.chat');
     })->name('chat');
@@ -21,6 +33,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', function () {
         return view('pages.profile');
     })->name('profile');
+
+    // =========================================================================
+    // ERP Routes
+    // =========================================================================
+
+    // POS (Punto de Venta)
+    Route::prefix('pos')->name('pos.')->group(function () {
+        Route::get('/', Terminal::class)->name('terminal');
+        Route::get('/cash-register/open', CashRegisterOpen::class)->name('cash-register.open');
+        Route::get('/cash-register/close', CashRegisterClose::class)->name('cash-register.close');
+    });
+
+    // Inventario y Productos
+    Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::get('/products', ProductList::class)->name('products');
+        Route::get('/products/create', ProductForm::class)->name('products.create');
+        Route::get('/products/{product}/edit', ProductForm::class)->name('products.edit');
+    });
+
+    // Reportes
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/sales', SalesDashboard::class)->name('sales');
+    });
 });
 
 // Rutas de autenticación temporales para desarrollo
