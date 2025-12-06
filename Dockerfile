@@ -83,16 +83,18 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # Crear Caddyfile para FrankenPHP
+# php_server debe estar dentro de un bloque route
 RUN printf '{\n\
     auto_https off\n\
     admin off\n\
-    order php_server before file_server\n\
 }\n\
 \n\
 :8040 {\n\
     root * /app/public\n\
     encode gzip\n\
-    php_server\n\
+    route {\n\
+        php_server\n\
+    }\n\
 }\n' > /etc/caddy/Caddyfile
 
 # Variables de entorno por defecto
