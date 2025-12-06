@@ -42,8 +42,9 @@ FROM dunglas/frankenphp:latest-php8.3-alpine
 LABEL maintainer="Mika Team"
 LABEL description="Mika - Asistente Financiero Chat-First"
 
-# Instalar extensiones PHP adicionales
-RUN install-php-extensions \
+# Instalar wget para healthcheck y extensiones PHP adicionales
+RUN apk add --no-cache wget \
+    && install-php-extensions \
     pdo_pgsql \
     pgsql \
     intl \
