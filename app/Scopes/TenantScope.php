@@ -13,7 +13,8 @@ class TenantScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $tenantId = app('current_tenant_id');
+        // Check if current_tenant_id is bound before resolving
+        $tenantId = app()->bound('current_tenant_id') ? app('current_tenant_id') : null;
 
         if ($tenantId) {
             $builder->where($model->getTable() . '.tenant_id', $tenantId);

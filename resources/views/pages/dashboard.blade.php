@@ -102,9 +102,11 @@
                     <h2 class="font-semibold mb-4">Estado de Caja</h2>
 
                     @php
-                        $cashRegister = \App\Models\CashRegister::where('branch_id', auth()->user()->branch_id)
-                            ->where('status', 'open')
-                            ->first();
+                        $cashRegister = auth()->user()->branch_id
+                            ? \App\Models\CashRegister::where('branch_id', auth()->user()->branch_id)
+                                ->where('status', 'open')
+                                ->first()
+                            : null;
                     @endphp
 
                     @if($cashRegister)
