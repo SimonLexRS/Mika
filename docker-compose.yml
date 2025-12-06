@@ -23,7 +23,7 @@ services:
     environment:
       - APP_NAME=${APP_NAME:-Mika}
       - APP_ENV=${APP_ENV:-production}
-      - APP_KEY=${APP_KEY:-base64:dGhpc2lzYXNlY3VyZWtleWZvcm1pa2FhcHAzMmI=}
+      - APP_KEY=${APP_KEY:-base64:aZzzRorM95Mjf4/gMIOgoFEtUj2zefunDfWIK5OQwQM=}
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_URL=${APP_URL:-http://localhost:8040}
       - DB_CONNECTION=pgsql
@@ -58,7 +58,7 @@ services:
       - mika-storage:/app/storage
     environment:
       - APP_ENV=${APP_ENV:-production}
-      - APP_KEY=${APP_KEY:-base64:dGhpc2lzYXNlY3VyZWtleWZvcm1pa2FhcHAzMmI=}
+      - APP_KEY=${APP_KEY:-base64:aZzzRorM95Mjf4/gMIOgoFEtUj2zefunDfWIK5OQwQM=}
       - DB_CONNECTION=pgsql
       - DB_HOST=${DB_HOST:-100.115.234.125}
       - DB_PORT=${DB_PORT:-5450}
