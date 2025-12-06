@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Alpine.js cloak */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Safe area insets para dispositivos móviles */
 .safe-area-inset {
     padding-top: env(safe-area-inset-top);

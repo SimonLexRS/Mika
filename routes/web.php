@@ -21,6 +21,18 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.dashboard');
     })->name('dashboard');
 
+    // Switch branch
+    Route::get('/switch-branch/{branch}', function (\App\Models\Branch $branch) {
+        // Verify user can access this branch
+        if ($branch->tenant_id !== auth()->user()->tenant_id) {
+            abort(403);
+        }
+
+        auth()->user()->update(['branch_id' => $branch->id]);
+
+        return redirect()->back()->with('success', 'Sucursal cambiada a ' . $branch->name);
+    })->name('switch.branch');
+
     // Chat (funcionalidad original de Mika)
     Route::get('/chat', function () {
         return view('pages.chat');
